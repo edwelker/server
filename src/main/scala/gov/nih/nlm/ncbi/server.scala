@@ -1,6 +1,8 @@
+package gov.nih.nlm.ncbi
+
 import com.twitter.finagle.{Http, Service}
-import com.twitter.io.Charsets
 import com.twitter.server.TwitterServer
+import com.twitter.io.Charset
 import com.twitter.util.{Await, Future}
 import org.jboss.netty.buffer.ChannelBuffers.copiedBuffer
 import org.jboss.netty.handler.codec.http._
