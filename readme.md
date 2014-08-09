@@ -22,11 +22,11 @@ Instructions for yum-based systems
 
 `wget http://www.scala-lang.org/files/archive/scala-2.10.4.rpm`
 
-`yum install scala-2.10.4.rpm`
+`sudo yum install scala-2.10.4.rpm`
 
 `wget http://dl.bintray.com/sbt/rpm/sbt-0.13.5.rpm`
 
-`yum install sbt-0.13.5.rpm`
+`sudo yum install sbt-0.13.5.rpm`
 
 
 ####Both
