@@ -10,4 +10,4 @@ libraryDependencies += "com.twitter" % "twitter-server_2.10" % "1.7.3"
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
 
-libraryDependencies += "com.twitter" % "finagle-stats" % "6.6.2"
+libraryDependencies += "com.twitter" % "finagle-stats_2.10" % "6.20.0"
