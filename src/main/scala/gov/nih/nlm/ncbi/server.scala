@@ -10,6 +10,8 @@ import com.twitter.util.{Await, Future, Time}
 import org.jboss.netty.buffer.ChannelBuffers.copiedBuffer
 import org.jboss.netty.handler.codec.http._
 
+import scala.collection.JavaConverters._
+
 object AdvancedServer extends TwitterServer {
 
   val what = flag("what", "hello", "String to return")
@@ -23,9 +25,9 @@ object AdvancedServer extends TwitterServer {
       counter.incr()
 
       val params = new QueryStringDecoder(request.getUri()).getParameters()
-      val sparams: String = params.toString
+      //val sparams: String = params.toString
 
-      val resp = <html><head><title>whateve</title></head><body><h1>The query string params sent</h1><p>{ sparams }</p></body></html>
+      val resp = <html><head><title>whateve</title></head><body><h1>The query string params sent</h1><dl>{ params.asScala.map( k, v => <dt>{k}</dt><dd>{v}</dd>) }</dl></body></html>
 
       val response =
         new DefaultHttpResponse(request.getProtocolVersion, HttpResponseStatus.OK)
