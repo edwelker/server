@@ -25,9 +25,11 @@ object AdvancedServer extends TwitterServer {
       val params = new QueryStringDecoder(request.getUri()).getParameters()
       val sparams: String = params.toString
 
+      val resp = <html><head><title>whateve</title></head><body><h1>The query string params sent</h1><p>{ sparams }</p></body></html>
+
       val response =
         new DefaultHttpResponse(request.getProtocolVersion, HttpResponseStatus.OK)
-      val content = copiedBuffer(sparams + "\n", Charsets.Utf8)
+      val content = copiedBuffer(resp + "\n", Charsets.Utf8)
       response.setContent(content)
       Future.value(response)
     }
