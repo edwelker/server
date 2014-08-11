@@ -21,9 +21,13 @@ object AdvancedServer extends TwitterServer {
     def apply(request: HttpRequest) = {
       log.debug("Received a request at " + Time.now)
       counter.incr()
+
+      val params = new QueryStringDecoder(request.getUri()).getParameters()
+      val sparams: String = params.toString
+
       val response =
         new DefaultHttpResponse(request.getProtocolVersion, HttpResponseStatus.OK)
-      val content = copiedBuffer(what() + "\n", Charsets.Utf8)
+      val content = copiedBuffer(sparams + "\n", Charsets.Utf8)
       response.setContent(content)
       Future.value(response)
     }
