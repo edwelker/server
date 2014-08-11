@@ -27,7 +27,7 @@ object AdvancedServer extends TwitterServer {
       val params = new QueryStringDecoder(request.getUri()).getParameters()
       //val sparams: String = params.toString
 
-      val resp = <html><head><title>whateve</title></head><body><h1>The query string params sent</h1><dl>{ params.asScala.map( k, v => <dt>{k}</dt><dd>{v}</dd>) }</dl></body></html>
+      val resp = <html><head><title>whatever</title></head><body><h1>The query string params sent</h1><dl>{ params.asScala.map( i => <dt>{i._1}</dt><dd>{i._2}</dd>) }</dl></body></html>
 
       val response =
         new DefaultHttpResponse(request.getProtocolVersion, HttpResponseStatus.OK)
