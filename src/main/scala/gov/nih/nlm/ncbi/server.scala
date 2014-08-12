@@ -5,6 +5,7 @@ import java.net.InetSocketAddress
 import com.twitter.conversions.time._
 import com.twitter.finagle.Http
 import com.twitter.finagle.Service
+import com.twitter.finagle.zookeeper._
 import com.twitter.finagle.http.HttpMuxer
 import com.twitter.io.Charsets
 import com.twitter.server.TwitterServer
@@ -20,16 +21,32 @@ object Server extends TwitterServer {
   val addr = flag("bind", new InetSocketAddress(0), "Bind address")
   val durations = flag("alarms", (1.second, 5.second), "2 alarm durations")
   val counter = statsReceiver.counter("requests_counter")
+ 
+  val zookeeperClient = new ZookeeperClient(1.second, "localhost:2181")
+  val serverSet = new ServerSetImpl(zk.zookeeperClient, "testservice")
+  val cluster = new ZookeeperServerSetCluster(serverSet)
+
+  cluster.join(serverHost)
 
   val service = new Service[HttpRequest, HttpResponse] {
     def apply(request: HttpRequest) = {
       log.debug("Received a request at " + Time.now)
       counter.incr()
 
+      //get the query string parameters, Map<String, List<String>>
       val params = new QueryStringDecoder(request.getUri()).getParameters()
+
+      //convert them to a string (tho they would be auto-cast elsewhere
       //val sparams: String = params.toString
 
-      val resp = <html><head><title>whatever</title></head><body><h1>The query string params sent</h1><dl>{ params.asScala.map( i => <dt>{i._1}</dt><dd>{i._2}</dd>) }</dl></body></html>
+      //map over Map items, do positional unpacking
+      val hparams = params.asScala.map{
+	 case i => <dt>{i._1}</dt><dd>{i._2}</dd>
+	 case _ => <i>None</i>
+      }
+
+      //string interpolation within a xml literal. weird.
+      val resp = <html><head><title>whatever</title></head><body><h1>The query string params sent</h1><dl>{ hparams }</dl></body></html>
 
       val response =
         new DefaultHttpResponse(request.getProtocolVersion, HttpResponseStatus.OK)
@@ -42,7 +59,7 @@ object Server extends TwitterServer {
 
   //so the quickstart uses sbt to imply which main to use
   def main() {
-    val server = Http.serveAndAnnounce("localhost:2181", ":8080", service)
+    val server = Http.serveAndAnnounce("zk!localhost:2181/a", ":8080", service)
     // We can create a new http server but in that case we profit from the
     // one already started for /admin/*
     // The `TwitterServer` trait exposes an `adminHttpServer` that serve all routes
