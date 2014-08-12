@@ -1,10 +1,12 @@
 package gov.nih.nlm.ncbi
 
 import java.net.InetSocketAddress
-import com.twitter.io.Charsets
+
 import com.twitter.conversions.time._
+import com.twitter.finagle.Http
 import com.twitter.finagle.Service
 import com.twitter.finagle.http.HttpMuxer
+import com.twitter.io.Charsets
 import com.twitter.server.TwitterServer
 import com.twitter.util.{Await, Future, Time}
 import org.jboss.netty.buffer.ChannelBuffers.copiedBuffer
@@ -12,7 +14,7 @@ import org.jboss.netty.handler.codec.http._
 
 import scala.collection.JavaConverters._
 
-object AdvancedServer extends TwitterServer {
+object Server extends TwitterServer {
 
   val what = flag("what", "hello", "String to return")
   val addr = flag("bind", new InetSocketAddress(0), "Bind address")
@@ -33,11 +35,14 @@ object AdvancedServer extends TwitterServer {
         new DefaultHttpResponse(request.getProtocolVersion, HttpResponseStatus.OK)
       val content = copiedBuffer(resp + "\n", Charsets.Utf8)
       response.setContent(content)
+      response.setHeader(HttpHeaders.Names.CONTENT_TYPE, "text/html")
       Future.value(response)
     }
   }
 
+  //so the quickstart uses sbt to imply which main to use
   def main() {
+    val server = Http.serveAndAnnounce("localhost:2181", ":8080", service)
     // We can create a new http server but in that case we profit from the
     // one already started for /admin/*
     // The `TwitterServer` trait exposes an `adminHttpServer` that serve all routes
