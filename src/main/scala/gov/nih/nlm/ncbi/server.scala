@@ -2,27 +2,28 @@ package gov.nih.nlm.ncbi
 
 import java.net.InetSocketAddress
 
-import com.twitter.conversions.time._
-import com.twitter.finagle.Service
-import com.twitter.finagle.http.HttpMuxer
-import com.twitter.finagle.zookeeper._
-import com.twitter.io.Charsets
-import com.twitter.server.TwitterServer
-import com.twitter.util._
-import org.jboss.netty.buffer.ChannelBuffers.copiedBuffer
-import org.jboss.netty.handler.codec.http._
+  import com.twitter.conversions.time._
+  import com.twitter.finagle.Service
+  import com.twitter.finagle.http.HttpMuxer
+  import com.twitter.finagle.zookeeper._
+  import com.twitter.io.Charsets
+  import com.twitter.server.TwitterServer
+  import com.twitter.util._
+  import org.jboss.netty.buffer.ChannelBuffers.copiedBuffer
+  import org.jboss.netty.handler.codec.http._
 
-import scala.collection.JavaConverters._
+  import scala.collection.JavaConverters._
 
-object Server extends TwitterServer {
+  object Server extends TwitterServer {
 
-  val what = flag("what", "hello", "String to return")
-  val addr = flag("bind", new InetSocketAddress(0), "Bind address")
-  val durations = flag("alarms", (1.second, 5.second), "2 alarm durations")
-  val counter = statsReceiver.counter("requests_counter")
+    val what = flag("what", "hello", "String to return")
+    val addr = flag("bind", new InetSocketAddress(0), "Bind address")
+    val durations = flag("alarms", (1.second, 5.second), "2 alarm durations")
+    val counter = statsReceiver.counter("requests_counter")
 
-  val zkres = new ZkResolver()
-  val nothing = zkres.bind("localhost:2181")
+    val in = new InetSocketAddress(0)
+    val zkres = new ZkAnnouncer()
+    val nothing = zkres.announce(in, "zk!127.0.0.1:2181!/edserver")
 
 
   val service = new Service[HttpRequest, HttpResponse] {
