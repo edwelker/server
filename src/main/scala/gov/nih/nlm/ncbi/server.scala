@@ -3,6 +3,7 @@ package gov.nih.nlm.ncbi
 import java.net.InetSocketAddress
 
   import com.twitter.conversions.time._
+  import com.twitter.finagle.Http
   import com.twitter.finagle.Service
   import com.twitter.finagle.http.HttpMuxer
   import com.twitter.finagle.zookeeper._
@@ -21,9 +22,8 @@ import java.net.InetSocketAddress
     val durations = flag("alarms", (1.second, 5.second), "2 alarm durations")
     val counter = statsReceiver.counter("requests_counter")
 
-    val in = new InetSocketAddress(0)
-    val zkres = new ZkAnnouncer()
-    val nothing = zkres.announce(in, "zk!127.0.0.1:2181!/edserver")
+    //val zkres = new ZkAnnouncer()
+    //val nothing = zkres.announce(in, "zk!127.0.0.1:2181!/edserver")
 
 
   val service = new Service[HttpRequest, HttpResponse] {
@@ -47,6 +47,10 @@ import java.net.InetSocketAddress
 
   //so the quickstart uses sbt to imply which main to use
   def main() {
+
+    val server = Http.serve(":8080", service)
+    server.announce("zk!127.0.0.1:2181!/edserver!0")
+    Await.ready(server)
 
     // We can create a new http server but in that case we profit from the
     // one already started for /admin/*
