@@ -22,7 +22,7 @@ object Server extends TwitterServer {
   val counter = statsReceiver.counter("requests_counter")
 
   val zkres = new ZkResolver()
-  val nothing = zkres.bind("localhost:2181")
+  val nothing = zkres.bind("localhost:2181!/edserver")
 
 
   val service = new Service[HttpRequest, HttpResponse] {
